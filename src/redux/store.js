@@ -4,8 +4,6 @@ import { createLogger } from 'redux-logger';
 import { persistStore, persistReducer } from 'redux-persist';
 import rootReducer from './reducers/index';
 
-AsyncStorage.clear();
-
 const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
@@ -20,7 +18,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const store = createStore(
     persistedReducer,
     applyMiddleware(
-        createLogger()
+        createLogger({ colors: true })
     )
 );
 

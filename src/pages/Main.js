@@ -1,25 +1,42 @@
+// React & Redux
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import * as actionCreators from '../redux/actions/index';
-import { StyleSheet, SafeAreaView, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Keyboard, Image } from 'react-native';
+
+// Expo Audio
+import { Audio } from 'expo-av';
+
+// React Native
+import { StyleSheet, SafeAreaView, Button, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Keyboard, Image } from 'react-native';
+
+// Icons
 import microphoneIcon from '../icons/microphone.png';
 import sendIcon from '../icons/send.png';
 import recordingIcon from '../icons/recording.png';
-import parseTime from '../util/parseTime';
+
+// Components
 import Chat from '../components/Chat';
+
+// Util
+import parseTime from '../util/parseTime';
 
 const Main = () => {
 
+    // Text Input
     const [bottomPos, setBottomPos] = useState(0);
     const [button, setButton] = useState({ type: 'voice', icon: recordingIcon });
     const [inputMessage, setInputMessage] = useState('');
-    const [recording, setRecording] = useState(false);
-    const [recordingStartTime, setRecordingStartTime] = useState(0);
-    const [timeRecording, setTimeRecording] = useState('0:00');
-    const [intervalId, setIntervalId] = useState(null);
 
+    // Voice Input
+    const [isRecording, setIsRecording] = useState(false);
+    const [timeRecording, setTimeRecording] = useState('0:00');
+    const [permission, setPermission] = useState(false);
+    const [recording, setRecording] = useState(null);
+
+    // Redux dispatcher
     const dispatch = useDispatch();
 
+    // Dynamic text input position
     useEffect(() => {
         Keyboard.addListener('keyboardDidShow', e => setBottomPos(e.endCoordinates.height));
         Keyboard.addListener('keyboardDidHide', () => setBottomPos(0));
@@ -29,11 +46,7 @@ const Main = () => {
         };
     });
 
-    useEffect(() => {
-        if (recordingStartTime !== 0)
-            setIntervalId(setInterval(() => setTimeRecording(parseTime(Math.round((Date.now() - recordingStartTime) / 1000))), 1000));
-    }, [recordingStartTime]);
-
+    // Button icon
     useEffect(() => {
         if (inputMessage !== '') {
             setButton({ type: 'text', icon: sendIcon });
@@ -43,29 +56,64 @@ const Main = () => {
     }, [inputMessage]);
 
     useEffect(() => {
-        if (recording === true) {
+        if (isRecording === true) {
             setButton({ type: 'recording', icon: recordingIcon });
         } else {
             setButton({ type: 'voice', icon: microphoneIcon });
         };
-    }, [recording]);
+    }, [isRecording]);
 
-    const buttonPressed = () => {
+    // Manage sent messages
+    const sendMessageHandler = async () => {
         if (button.type === 'voice') {
-            setRecordingStartTime(Date.now());
-            setRecording(true);
+            // Voice message
+            if (permission !== true) {
+                const perm = await Audio.requestPermissionsAsync();
+                if (perm.granted === true) {
+                    await Audio.setAudioModeAsync({
+                        allowsRecordingIOS: true,
+                        playsInSilentModeIOS: true
+                    });
+                    setPermission(true);
+                };
+            };
+            await Audio.setAudioModeAsync({ allowsRecordingIOS: true });
+            const recordingInstance = new Audio.Recording();
+            await recordingInstance.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+            recordingInstance.setProgressUpdateInterval(1000);
+            recordingInstance.setOnRecordingStatusUpdate(status => {
+                if (status.canRecord) {
+                    setIsRecording(status.isRecording);
+                    setTimeRecording(parseTime(Math.round(status.durationMillis / 1000)));
+                } else if (status.isDoneRecording) {
+                    setIsRecording(false);
+                    setTimeRecording(('0:00'));
+                };
+            });
+            recordingInstance.startAsync()
+                .then(status => {
+                    setIsRecording(status.isRecording);
+                    setTimeRecording(parseTime(Math.round(status.durationMillis / 1000)));
+                })
+                .catch(e => console.error(e));
+            setRecording(recordingInstance);
         } else if (button.type === 'text') {
-            dispatch(actionCreators.add({ type: 'txt', msg: inputMessage, from: 'self' }));
+            // Text message
+            dispatch(actionCreators.add({ type: 'txt', msg: inputMessage, from: 'self', time: new Date() }));
             setInputMessage('');
         };
     };
 
-    const sendVoiceMessageConcluded = () => {
-        clearInterval(intervalId);
-        setRecording(false);
-        setTimeRecording('0:00');
+    // Conclude recording
+    const sendMessageConcluded = async () => {
+        if (button.type === 'recording') {
+            const { durationMillis } = await recording.stopAndUnloadAsync();
+            const uri = recording.getURI();
+            dispatch(actionCreators.add({ type: 'audio', msg: { uri, duration: durationMillis }, from: 'self', time: new Date() }));
+        };
     };
 
+    // CSS Styles
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -103,8 +151,9 @@ const Main = () => {
         }
     });
 
+    // Input field does not appear when app is recording, in which case it will show the recording time instead.
     let inputView;
-    if (recording === true) {
+    if (isRecording === true) {
         inputView = (
             <Text
                 style={styles.time}>
@@ -124,7 +173,7 @@ const Main = () => {
             <Chat />
             <KeyboardAvoidingView style={styles.footer}  >
                 {inputView}
-                <TouchableOpacity style={styles.button} onPress={sendVoiceMessageConcluded} onPressIn={buttonPressed} onPressOut={sendVoiceMessageConcluded}>
+                <TouchableOpacity style={styles.button} onPress={sendMessageConcluded} onPressIn={sendMessageHandler}>
                     <Image source={button.icon} />
                 </TouchableOpacity>
             </KeyboardAvoidingView>

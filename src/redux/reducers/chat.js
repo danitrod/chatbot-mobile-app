@@ -1,12 +1,10 @@
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-    history: [{ type: 'txt', msg: 'Hi, my name is Watson', from: 'other' }]
+    history: [{ type: 'txt', msg: 'Hi, my name is Watson', from: 'other', time: new Date() }]
 };
 
 const reducer = (state = initialState, action) => {
-    console.log('reducer called');
-    console.log('new history:', state.history.concat(action.message));
     switch (action.type) {
         case actionTypes.ADD_MESSAGE:
             return {

@@ -1,9 +1,15 @@
+// React app navigation container, stack navigator & react
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import React from 'react';
+
+// App pages
 import Main from './pages/Main';
 import Settings from './pages/Settings';
-import React from 'react';
+
+// Header buttons
 import SettingsButton from './components/SettingsButton';
+import ClearButton from './components/ClearButton';
 
 const Routes = createAppContainer(
     createStackNavigator({
@@ -11,7 +17,9 @@ const Routes = createAppContainer(
             screen: Main,
             navigationOptions: ({ navigation }) => ({
                 title: 'My Assistant',
-                headerRight: () => (<SettingsButton navigate={() => navigation.navigate('Settings')} />),
+                headerLeft: () => (<SettingsButton navigate={() => navigation.navigate('Settings')} />),
+                headerLeftContainerStyle: { paddingHorizontal: 8 },
+                headerRight: () => (<ClearButton />),
                 headerRightContainerStyle: { paddingHorizontal: 8 }
             })
         },
