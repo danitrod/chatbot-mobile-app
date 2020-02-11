@@ -7,20 +7,22 @@ import React from 'react';
 import Main from './pages/Main';
 import Settings from './pages/Settings';
 
-// Header buttons
-import SettingsButton from './components/SettingsButton';
-import ClearButton from './components/ClearButton';
+// Header components
+import Title from './components/Header/Title';
+import SettingsButton from './components/Header/SettingsButton';
+import ClearButton from './components/Header/ClearButton';
 
 const Routes = createAppContainer(
     createStackNavigator({
         Main: {
             screen: Main,
             navigationOptions: ({ navigation }) => ({
-                title: 'My Assistant',
+                headerTitle: () => (<Title />),
+                headerTitleContainerStyle: { width: '60%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8 },
                 headerLeft: () => (<SettingsButton navigate={() => navigation.navigate('Settings')} />),
-                headerLeftContainerStyle: { paddingHorizontal: 8 },
+                headerLeftContainerStyle: { width: '20%', paddingHorizontal: 8 },
                 headerRight: () => (<ClearButton />),
-                headerRightContainerStyle: { paddingHorizontal: 8 }
+                headerRightContainerStyle: { width: '20%', paddingHorizontal: 8 }
             })
         },
         Settings: {

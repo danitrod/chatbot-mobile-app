@@ -2,16 +2,16 @@ import React from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import { store, persistor } from './src/redux/store';
-import { StatusBar, YellowBox } from 'react-native';
+import { StatusBar, YellowBox, Platform } from 'react-native';
 import Routes from './src/routes';
 
-YellowBox.ignoreWarnings([]);
+YellowBox.ignoreWarnings(["Warning: Can't perform a React state update on an unmounted component."]);
 
 const App = () => {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <StatusBar barStyle="dark-content" backgroundColor="#000" />
+        <StatusBar barStyle={Platform.OS === 'ios' ? "dark-content" : "default"} backgroundColor="#000" />
         <Routes />
       </PersistGate>
     </Provider>

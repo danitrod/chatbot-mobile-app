@@ -7,7 +7,7 @@ import * as actionCreators from '../redux/actions/index';
 import { Audio } from 'expo-av';
 
 // React Native
-import { StyleSheet, SafeAreaView, Button, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Keyboard, Image } from 'react-native';
+import { StyleSheet, SafeAreaView, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Keyboard, Image } from 'react-native';
 
 // Icons
 import microphoneIcon from '../icons/microphone.png';
@@ -41,11 +41,11 @@ const Main = () => {
         Keyboard.addListener('keyboardDidShow', e => setBottomPos(e.endCoordinates.height));
         Keyboard.addListener('keyboardDidHide', () => setBottomPos(0));
         return () => {
-            Keyboard.removeAllListeners('keyboardDidShow');
-            Keyboard.removeAllListeners('keyboardDidHide');
+            Keyboard.removeListener('keyboardDidShow');
+            Keyboard.removeListener('keyboardDidHide');
         };
     });
-
+    
     // Button icon
     useEffect(() => {
         if (inputMessage !== '') {
@@ -99,6 +99,7 @@ const Main = () => {
             setRecording(recordingInstance);
         } else if (button.type === 'text') {
             // Text message
+            Keyboard.dismiss();
             dispatch(actionCreators.add({ type: 'txt', msg: inputMessage, from: 'self', time: new Date() }));
             setInputMessage('');
         };
@@ -124,7 +125,7 @@ const Main = () => {
             width: '100%',
             left: 0,
             bottom: bottomPos,
-            height: 64,
+            height: 44,
             backgroundColor: '#f0f0f0',
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -134,7 +135,8 @@ const Main = () => {
             borderTopWidth: 0.5
         },
         input: {
-            height: 32,
+            height: 26,
+            fontSize: 16,
             padding: 0,
             paddingHorizontal: 8,
             width: '75%',
@@ -143,8 +145,8 @@ const Main = () => {
             borderRadius: 25
         },
         button: {
-            width: 32,
-            height: 32
+            width: 26,
+            height: 26
         },
         time: {
             fontSize: 32
@@ -173,8 +175,8 @@ const Main = () => {
             <Chat />
             <KeyboardAvoidingView style={styles.footer}  >
                 {inputView}
-                <TouchableOpacity style={styles.button} onPress={sendMessageConcluded} onPressIn={sendMessageHandler}>
-                    <Image source={button.icon} />
+                <TouchableOpacity onPress={sendMessageConcluded} onPressIn={sendMessageHandler}>
+                    <Image source={button.icon} style={styles.button} />
                 </TouchableOpacity>
             </KeyboardAvoidingView>
         </SafeAreaView >

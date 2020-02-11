@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useRef } from 'react';
 import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Audio } from 'expo-av';
@@ -8,17 +8,24 @@ import parseTime from '../util/parseTime';
 
 const Chat = () => {
 
+    // Chat history state from store
     const state = useSelector((state) => {
         return {
             history: state.chatReducer.history
         };
     });
+
+    // Audio playing state
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
     const [playbackObject, setPlaybackObject] = useState(null);
     const [playbackObjectId, setPlaybackObjectId] = useState(null);
 
+    // ScrollView chat container ref
+    const chatContainerRef = useRef();
+
+    // Playing a selected audio
     const playAudio = async (uri, key) => {
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
         const newAudio = await Audio.Sound.createAsync({ uri });
         newAudio.sound.setOnPlaybackStatusUpdate(status => {
             if (status.didJustFinish) {
@@ -36,6 +43,7 @@ const Chat = () => {
         setPlaybackObject(newAudio);
     }
 
+    // Play/pause button press
     const voiceMsgBtnHandler = async (uri, key) => {
         if (isPlayingAudio === false) {
             if (playbackObjectId !== key) {
@@ -60,7 +68,7 @@ const Chat = () => {
     };
 
     return (
-        <ScrollView style={styles.chat} contentContainerStyle={{ justifyContent: 'flex-end' }}>
+        <ScrollView ref={chatContainerRef} onContentSizeChange={() => chatContainerRef.current.scrollToEnd()} style={styles.chat} contentContainerStyle={{ justifyContent: 'flex-end' }}>
             {state.history.map((message, index) => {
                 const style = [styles.chatBubble];
                 if (message.from === 'self') {
@@ -85,9 +93,9 @@ const Chat = () => {
                     const icon = (playbackObjectId === message.time && isPlayingAudio === true) ? pauseIcon : playIcon;
                     output = (
                         <View key={message.time} style={style}>
-                            <TouchableOpacity 
-                            style={{ width: 32, height: 32 }} 
-                            onPress={() => voiceMsgBtnHandler(message.msg.uri, message.time)}>
+                            <TouchableOpacity
+                                style={{ width: 32, height: 32 }}
+                                onPress={() => voiceMsgBtnHandler(message.msg.uri, message.time)}>
                                 <Image source={icon} />
                             </TouchableOpacity>
                             <Text style={{ fontSize: 22 }}>{parseTime(Math.round(message.msg.duration / 1000))}</Text>
@@ -106,7 +114,7 @@ const styles = StyleSheet.create({
         width: '100%',
         top: 0,
         left: 0,
-        bottom: 64
+        bottom: 44
     },
     chatBubble: {
         minWidth: '40%',

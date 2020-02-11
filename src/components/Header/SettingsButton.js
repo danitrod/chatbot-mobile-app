@@ -1,5 +1,5 @@
 import React from 'react';
-import settingsIcon from '../icons/settings.png';
+import settingsIcon from '../../icons/settings.png';
 import { TouchableOpacity, Image } from 'react-native';
 
 const SettingsButton = ({ navigate }) => {

@@ -1,15 +1,8 @@
 import * as actionTypes from './actionTypes';
 
-export const changeCredentialsWatson = (newCredentials) => {
+export const changeCredentials = (newCredentials) => {
     return {
-        type: actionTypes.CHANGE_CREDENTIALS_WA,
-        newCredentials
-    };
-};
-
-export const changeCredentialsOrchestrator = (newCredentials) => {
-    return {
-        type: actionTypes.CHANGE_CREDENTIALS_OR,
+        type: actionTypes.CHANGE_CREDENTIALS,
         newCredentials
     };
 };

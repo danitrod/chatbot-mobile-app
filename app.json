@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "My Mobile Assistant",
+    "slug": "chatbot-mobile-app",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [

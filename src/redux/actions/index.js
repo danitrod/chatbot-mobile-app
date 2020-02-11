@@ -3,6 +3,5 @@ export {
     refresh
 } from './chat';
 export {
-    changeCredentialsWatson,
-    changeCredentialsOrchestrator
+    changeCredentials,
 } from './settings';
