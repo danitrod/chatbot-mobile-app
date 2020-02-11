@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Audio } from 'expo-av';
@@ -13,47 +13,82 @@ const Chat = () => {
             history: state.chatReducer.history
         };
     });
+    const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+    const [playbackObject, setPlaybackObject] = useState(null);
+    const [playbackObjectId, setPlaybackObjectId] = useState(null);
 
-    const playAudio = async (uri) => {
-        console.log('indo tocar');
+    const playAudio = async (uri, key) => {
         await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
         const newAudio = await Audio.Sound.createAsync({ uri });
-        await newAudio.sound.playAsync();
+        newAudio.sound.setOnPlaybackStatusUpdate(status => {
+            if (status.didJustFinish) {
+                setIsPlayingAudio(false);
+                setPlaybackObjectId(null);
+            };
+        });
+        await newAudio.sound.setProgressUpdateIntervalAsync(50);
+        newAudio.sound.playAsync()
+            .then(() => {
+                setIsPlayingAudio(true);
+                setPlaybackObjectId(key);
+            })
+            .catch(e => console.error(e));
+        setPlaybackObject(newAudio);
+    }
+
+    const voiceMsgBtnHandler = async (uri, key) => {
+        if (isPlayingAudio === false) {
+            if (playbackObjectId !== key) {
+                playAudio(uri, key);
+            } else {
+                playbackObject.sound.playAsync()
+                    .then(() => {
+                        setIsPlayingAudio(true);
+                    })
+                    .catch(e => console.error(e));
+            }
+        } else {
+            if (playbackObjectId === key) {
+                await playbackObject.sound.pauseAsync();
+                setIsPlayingAudio(false);
+            } else {
+                await playbackObject.sound.stopAsync();
+                await playbackObject.sound.unloadAsync();
+                await playAudio(uri, key);
+            };
+        };
     };
 
     return (
         <ScrollView style={styles.chat} contentContainerStyle={{ justifyContent: 'flex-end' }}>
             {state.history.map((message, index) => {
-                let style;
+                const style = [styles.chatBubble];
                 if (message.from === 'self') {
-                    style = {
-                        bubble: [styles.chatBubbleRight],
-                        text: styles.chatTextRight
-                    };
+                    style.push(styles.bubbleRight);
                 } else {
-                    style = {
-                        bubble: [styles.chatBubbleLeft],
-                        text: styles.chatTextLeft,
-                    };
+                    style.push(styles.bubbleLeft);
                 };
                 if (index > 0 && state.history[index - 1].from === message.from) {
-                    style.bubble.push(styles.notFirstMessage);
+                    style.push(styles.notFirstMessage);
                 };
                 if (index < state.history.length - 1 && state.history[index + 1].from === message.from) {
-                    style.bubble.push(styles.notLastMessage);
+                    style.push(styles.notLastMessage);
                 };
                 let output;
                 if (message.type === 'txt') {
                     output = (
-                        <View key={message.time} style={style.bubble}>
-                            <Text style={style.text}>{message.msg}</Text>
+                        <View key={message.time} style={style}>
+                            <Text style={styles.chatText}>{message.msg}</Text>
                         </View>
                     );
                 } else {
+                    const icon = (playbackObjectId === message.time && isPlayingAudio === true) ? pauseIcon : playIcon;
                     output = (
-                        <View key={message.time} style={style.bubble}>
-                            <TouchableOpacity style={{ width: 32, height: 32 }} onPress={() => playAudio(message.msg.uri)}>
-                                <Image source={playIcon} />
+                        <View key={message.time} style={style}>
+                            <TouchableOpacity 
+                            style={{ width: 32, height: 32 }} 
+                            onPress={() => voiceMsgBtnHandler(message.msg.uri, message.time)}>
+                                <Image source={icon} />
                             </TouchableOpacity>
                             <Text style={{ fontSize: 22 }}>{parseTime(Math.round(message.msg.duration / 1000))}</Text>
                         </View>
@@ -73,47 +108,43 @@ const styles = StyleSheet.create({
         left: 0,
         bottom: 64
     },
-    chatBubbleLeft: {
-        position: 'relative',
-        width: '40%',
-        backgroundColor: '#fff',
-        marginHorizontal: 8,
-        marginVertical: 8,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderStyle: 'solid',
-        borderWidth: 0.5,
-        borderRadius: 8,
-        borderColor: '#000'
-    },
-    chatBubbleRight: {
-        backgroundColor: '#dcf8c6',
-        width: '40%',
+    chatBubble: {
+        minWidth: '40%',
+        maxWidth: '75%',
+        shadowRadius: 1,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 0
+        },
+        shadowOpacity: 0.5,
         marginHorizontal: 8,
         marginVertical: 4,
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderStyle: 'solid',
-        borderWidth: 0.5,
-        borderColor: '#000',
         borderRadius: 8,
-        alignSelf: 'flex-end',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
     },
+    bubbleLeft: {
+        backgroundColor: '#fff'
+    },
+    bubbleRight: {
+        backgroundColor: '#dcf8c6',
+        alignSelf: 'flex-end',
+    },
     notFirstMessage: {
-        marginTop: 0
+        marginTop: 1
     },
     notLastMessage: {
-        marginBottom: 0
+        marginBottom: 1
     },
-    chatTextLeft: {
+    chatText: {
         fontSize: 16,
     },
-    chatTextRight: {
-        fontSize: 16,
-        textAlign: 'right',
+    voiceMessage: {
+
     }
 });
 

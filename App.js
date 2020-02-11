@@ -5,7 +5,7 @@ import { store, persistor } from './src/redux/store';
 import { StatusBar, YellowBox } from 'react-native';
 import Routes from './src/routes';
 
-YellowBox.ignoreWarnings(['Warning: Encountered two children with the same key']);
+YellowBox.ignoreWarnings([]);
 
 const App = () => {
   return (
