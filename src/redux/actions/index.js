@@ -3,5 +3,5 @@ export {
     refresh
 } from './chat';
 export {
-    changeCredentials,
+    changeCredentials
 } from './settings';

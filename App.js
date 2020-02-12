@@ -4,6 +4,15 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './src/redux/store';
 import { StatusBar, YellowBox, Platform } from 'react-native';
 import Routes from './src/routes';
+import { decode, encode } from 'base-64'
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+
+if (!global.atob) {
+  global.atob = decode;
+}
 
 YellowBox.ignoreWarnings(["Warning: Can't perform a React state update on an unmounted component."]);
 

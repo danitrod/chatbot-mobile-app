@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         width: '100%',
         top: 0,
         left: 0,
-        bottom: 44
+        bottom: 52
     },
     chatBubble: {
         minWidth: '40%',

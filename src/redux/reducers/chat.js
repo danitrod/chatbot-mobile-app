@@ -1,7 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 
 const initialState = {
-    history: [{ type: 'txt', msg: 'Hi, my name is Watson', from: 'other', time: new Date() }]
+    history: []
 };
 
 const reducer = (state = initialState, action) => {

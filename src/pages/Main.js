@@ -38,14 +38,23 @@ const Main = () => {
 
     // Dynamic text input position
     useEffect(() => {
-        Keyboard.addListener('keyboardDidShow', e => setBottomPos(e.endCoordinates.height));
-        Keyboard.addListener('keyboardDidHide', () => setBottomPos(0));
-        return () => {
-            Keyboard.removeListener('keyboardDidShow');
-            Keyboard.removeListener('keyboardDidHide');
+        if (Platform.OS === 'ios') {
+            Keyboard.addListener('keyboardWillChangeFrame', e => setBottomPos(e.endCoordinates.height));
+            Keyboard.addListener('keyboardWillHide', () => setBottomPos(0));
+            return () => {
+                Keyboard.removeListener('keyboardWillChangeFrame');
+                Keyboard.removeListener('keyboardWillHide');
+            };
+        } else {
+            Keyboard.addListener('keyboardDidShow', e => setBottomPos(e.endCoordinates.height));
+            Keyboard.addListener('keyboardDidHide', () => setBottomPos(0));
+            return () => {
+                Keyboard.removeListener('keyboardDidShow');
+                Keyboard.removeListener('keyboardDidHide');
+            };
         };
     });
-    
+
     // Button icon
     useEffect(() => {
         if (inputMessage !== '') {
@@ -125,7 +134,7 @@ const Main = () => {
             width: '100%',
             left: 0,
             bottom: bottomPos,
-            height: 44,
+            height: 52,
             backgroundColor: '#f0f0f0',
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -142,7 +151,9 @@ const Main = () => {
             width: '75%',
             maxWidth: 256,
             backgroundColor: '#fff',
-            borderRadius: 25
+            borderRadius: 25,
+            borderColor: '#ccc',
+            borderWidth: 1
         },
         button: {
             width: 26,
@@ -164,6 +175,7 @@ const Main = () => {
     } else {
         inputView = (
             <TextInput
+                multiline={true}
                 value={inputMessage}
                 style={styles.input}
                 onChangeText={m => setInputMessage(m)} />

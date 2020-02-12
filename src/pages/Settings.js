@@ -1,26 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import * as actionCreators from '../redux/actions/index';
-import { SafeAreaView, View, Text, TextInput, StyleSheet, Button, Switch, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import {
+    SafeAreaView, View, Text, TextInput, StyleSheet,
+    Button, Switch, Keyboard, Picker, TouchableWithoutFeedback,
+    ActionSheetIOS
+} from 'react-native';
 
 const Settings = () => {
 
     const dispatch = useDispatch();
 
-    const [bottomPadding, setBottomPadding] = useState(0);
+    const [paddingBottom, setPaddingBottom] = useState(0);
 
     // Dynamic text input position
     useEffect(() => {
-        Keyboard.addListener('keyboardDidShow', e => setBottomPadding(Math.round(e.endCoordinates.height)));
-        Keyboard.addListener('keyboardDidHide', () => setBottomPadding(0));
-        return () => {
-            Keyboard.removeListener('keyboardDidShow');
-            Keyboard.removeListener('keyboardDidHide');
+        if (Platform.OS === 'ios') {
+            Keyboard.addListener('keyboardWillChangeFrame', e => setPaddingBottom(e.endCoordinates.height));
+            Keyboard.addListener('keyboardWillHide', () => setPaddingBottom(0));
+            return () => {
+                Keyboard.removeListener('keyboardWillChangeFrame');
+                Keyboard.removeListener('keyboardWillHide');
+            };
+        } else {
+            Keyboard.addListener('keyboardDidShow', e => setPaddingBottom(e.endCoordinates.height));
+            Keyboard.addListener('keyboardDidHide', () => setPaddingBottom(0));
+            return () => {
+                Keyboard.removeListener('keyboardDidShow');
+                Keyboard.removeListener('keyboardDidHide');
+            };
         };
     });
 
-    const [switchValue, setSwitchValue] = useState(false);
-    const [formLayout, setFormLayout] = useState({
+    const assistantFormLayout = {
         type: 'WA',
         name: 'Watson Assistant',
         fields: [{
@@ -32,45 +44,48 @@ const Settings = () => {
         }, {
             name: 'Assistant ID',
             value: ''
-        }
-        ]
-    });
+        },
+        {
+            name: 'Location',
+            options: [
+                { name: 'Dallas', url: 'https://api.us-south.assistant.watson.cloud.ibm.com' },
+                { name: 'Washington, DC', url: 'https://api.us-east.assistant.watson.cloud.ibm.com' },
+                { name: 'Frankfurt', url: 'https://api.eu-de.assistant.watson.cloud.ibm.com' },
+                { name: 'Sydney', url: 'https://api.au-syd.assistant.watson.cloud.ibm.com' },
+                { name: 'Tokyo', url: 'https://api.jp-tok.assistant.watson.cloud.ibm.com' },
+                { name: 'London', url: 'https://api.eu-gb.assistant.watson.cloud.ibm.com' },
+                { name: 'Seoul', url: 'https://api.kr-seo.assistant.watson.cloud.ibm.com' }],
+            value: 'https://api.us-south.assistant.watson.cloud.ibm.com'
+        }]
+    };
+
+    const orchestratorFormLayout = {
+        type: 'OR',
+        name: 'Orchestrator',
+        fields: [{
+            name: 'Assistant Name',
+            value: ''
+        }, {
+            name: 'Orchestrator URL',
+            value: ''
+        }]
+    };
+
+    const [switchValue, setSwitchValue] = useState(false);
+    const [formLayout, setFormLayout] = useState(assistantFormLayout);
 
     const switchValueChangeHandler = value => {
         setSwitchValue(value);
         if (value === false) {
-            setFormLayout({
-                type: 'WA',
-                name: 'Watson Assistant',
-                fields: [{
-                    name: 'Assistant Name',
-                    value: ''
-                }, {
-                    name: 'Apikey',
-                    value: ''
-                }, {
-                    name: 'Assistant ID',
-                    value: ''
-                }]
-            });
+            setFormLayout(assistantFormLayout);
         } else {
-            setFormLayout({
-                type: 'OR',
-                name: 'Orchestrator',
-                fields: [{
-                    name: 'Assistant Name',
-                    value: ''
-                }, {
-                    name: 'Orchestrator URL',
-                    value: ''
-                }]
-            });
+            setFormLayout(orchestratorFormLayout);
         };
     };
 
-    const fieldValueChangeHandler = (t, index) => {
+    const fieldValueChangeHandler = (v, index) => {
         const newFieldsValue = formLayout.fields;
-        newFieldsValue[index].value = t;
+        newFieldsValue[index].value = v;
         setFormLayout({
             ...formLayout,
             fields: newFieldsValue
@@ -82,7 +97,8 @@ const Settings = () => {
         if (formLayout.type === 'WA') {
             values = {
                 apikey: formLayout.fields[1].value,
-                assistandId: formLayout.fields[2].value
+                assistantId: formLayout.fields[2].value,
+                url: formLayout.fields[3].value
             };
         } else {
             values = {
@@ -101,7 +117,7 @@ const Settings = () => {
             padding: 24,
             flex: 1,
             backgroundColor: '#f2f2f8',
-            paddingBottom: bottomPadding
+            paddingBottom
         },
         form: {
             flex: 1,
@@ -124,6 +140,7 @@ const Settings = () => {
         },
         input: {
             height: 32,
+            fontSize: 16,
             paddingHorizontal: 8,
             width: '100%',
             backgroundColor: '#fff'
@@ -157,12 +174,34 @@ const Settings = () => {
                     </View>
                     {/* <View style={styles.fields}> */}
                     {formLayout.fields.map((field, index) => {
-                        return (
-                            <View key={field.name} style={styles.formElement}>
-                                <Text style={styles.labelText}>{field.name}</Text>
-                                <TextInput value={field.value} onChangeText={t => fieldValueChangeHandler(t, index)} style={styles.input} />
-                            </View>
-                        );
+                        if (field.name === 'Location') {
+                            if (Platform.OS !== 'ios') {
+                                return (
+                                    <View key={field.name} style={styles.formElement}>
+                                        <Text style={styles.labelText}>{field.name}</Text>
+                                        <Picker key={field.name} style={{ width: '100%', height: 50, backgroundColor: '#fff' }} selectedValue={field.value} onValueChange={v => fieldValueChangeHandler(v, index)} >
+                                            {field.options.map(value => <Picker.Item key={value.name} label={value.name} value={value.url} />)}
+                                        </Picker>
+                                    </View>
+                                );
+                            } else {
+                                return (
+                                    <View key={field.name} style={[styles.formElement, {alignItems: 'center'}]}>
+                                        <Text style={styles.labelText}>{field.name}</Text>
+                                        <Button onPress={() => ActionSheetIOS.showActionSheetWithOptions({ options: field.options.map(option => option.name) }, i => {
+                                            fieldValueChangeHandler(field.options[i].url, index)
+                                        })} title={field.options.find(option => option.url === field.value).name} />
+                                    </View>
+                                );
+                            };
+                        } else {
+                            return (
+                                <View key={field.name} style={styles.formElement}>
+                                    <Text style={styles.labelText}>{field.name}</Text>
+                                    <TextInput value={field.value} onChangeText={v => fieldValueChangeHandler(v, index)} style={styles.input} />
+                                </View>
+                            );
+                        };
                     })}
                     {/* </View> */}
                     <Button style={styles.submitButton} onPress={submitNewCredentialsHandler} title="Save and change settings" />
