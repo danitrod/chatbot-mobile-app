@@ -1,5 +1,5 @@
 export {
-    add,
+    addMessage,
     refresh
 } from './chat';
 export {

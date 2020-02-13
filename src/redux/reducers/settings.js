@@ -13,16 +13,15 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
+        case actionTypes.SET_CREDENTIALS:
+            return action.credentials;
         case actionTypes.CHANGE_CREDENTIALS_STARTED:
             return { ...state, loading: true };
         case actionTypes.CHANGE_CREDENTIALS_SUCCESS:
-            return action.newCredentials;
-        case actionTypes.CHANGE_CREDENTIALS_SUCCESS:
-            return {
-                ...state,
-                err: true,
-                msg: action.msg
-            }
+            return state;
+        case actionTypes.CHANGE_CREDENTIALS_FAILURE:
+            console.error('Error updating credentials:', action.msg);
+            return state;
         default:
             return state;
     };

@@ -109,7 +109,7 @@ const Main = () => {
         } else if (button.type === 'text') {
             // Text message
             Keyboard.dismiss();
-            dispatch(actionCreators.add({ type: 'txt', msg: inputMessage, from: 'self', time: new Date() }));
+            dispatch(actionCreators.addMessage({ type: 'txt', msg: inputMessage, from: 'self', time: new Date() }));
             setInputMessage('');
         };
     };
@@ -119,7 +119,7 @@ const Main = () => {
         if (button.type === 'recording') {
             const { durationMillis } = await recording.stopAndUnloadAsync();
             const uri = recording.getURI();
-            dispatch(actionCreators.add({ type: 'audio', msg: { uri, duration: durationMillis }, from: 'self', time: new Date() }));
+            dispatch(actionCreators.addMessage({ type: 'audio', msg: { uri, duration: durationMillis }, from: 'self', time: new Date() }));
         };
     };
 
@@ -144,10 +144,9 @@ const Main = () => {
             borderTopWidth: 0.5
         },
         input: {
-            height: 26,
+            height: 32,
             fontSize: 16,
-            padding: 0,
-            paddingHorizontal: 8,
+            paddingHorizontal: 16,
             width: '75%',
             maxWidth: 256,
             backgroundColor: '#fff',

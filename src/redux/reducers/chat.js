@@ -6,14 +6,20 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.ADD_MESSAGE:
+        case actionTypes.ADD_MESSAGE_SUCCESS:
             return {
                 history: state.history.concat(action.message)
             };
-        case actionTypes.REFRESH:
+        case actionTypes.ADD_MESSAGE_FAILURE:
+            console.error('Error sending message:', action.msg);
+            return state;
+        case actionTypes.REFRESH_SUCCESS:
             return {
-                history: []
+                history: action.message
             };
+        case actionTypes.REFRESH_FAILURE:
+            console.error('Error refreshing chat:', action.msg);
+            return state;
         default:
             return state;
     };
