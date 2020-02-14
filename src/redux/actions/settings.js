@@ -1,31 +1,18 @@
 import * as actionTypes from './actionTypes';
 import { refresh } from './index';
-// import { createSession } from '../../services/assistant/conversation';
 
+// Change credentials: sets new credentials and calls refresh, which clears chat history, adds first message and sets sessionId
 export const changeCredentials = (newCredentials) => {
-    return async dispatch => {
-        dispatch(changeCredentialsStarted());
+    return dispatch => {
         dispatch(setCredentials(newCredentials));
         dispatch(refresh());
     };
 };
 
+// Set credentials: sets state credentials
 export const setCredentials = credentials => {
     return {
         type: actionTypes.SET_CREDENTIALS,
         credentials
     };
 };
-
-const changeCredentialsStarted = () => ({
-    type: actionTypes.CHANGE_CREDENTIALS_STARTED
-});
-const changeCredentialsSuccess = newCredentials => ({
-    type: actionTypes.CHANGE_CREDENTIALS_SUCCESS,
-    newCredentials
-});
-
-const changeCredentialsFailure = error => ({
-    type: actionTypes.CHANGE_CREDENTIALS_FAILURE,
-    msg: error
-});

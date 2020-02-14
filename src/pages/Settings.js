@@ -1,40 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import * as actionCreators from '../redux/actions/index';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { changeCredentials } from '../redux/actions/index';
 import {
-    SafeAreaView, View, Text, TextInput, StyleSheet,
+    SafeAreaView, ScrollView, View, Text, TextInput, StyleSheet,
     Button, Switch, Keyboard, Picker, TouchableWithoutFeedback,
-    ActionSheetIOS
+    ActionSheetIOS, TouchableOpacity
 } from 'react-native';
+import ErrorModal from '../components/ErrorModal';
 
 const Settings = () => {
 
-    const dispatch = useDispatch();
-
-    const [paddingBottom, setPaddingBottom] = useState(0);
-
-    // Dynamic text input position
-    useEffect(() => {
-        if (Platform.OS === 'ios') {
-            Keyboard.addListener('keyboardWillChangeFrame', e => setPaddingBottom(e.endCoordinates.height));
-            Keyboard.addListener('keyboardWillHide', () => setPaddingBottom(0));
-            return () => {
-                Keyboard.removeListener('keyboardWillChangeFrame');
-                Keyboard.removeListener('keyboardWillHide');
-            };
-        } else {
-            Keyboard.addListener('keyboardDidShow', e => setPaddingBottom(e.endCoordinates.height));
-            Keyboard.addListener('keyboardDidHide', () => setPaddingBottom(0));
-            return () => {
-                Keyboard.removeListener('keyboardDidShow');
-                Keyboard.removeListener('keyboardDidHide');
-            };
+    // Check errors to show modal
+    const { err = false, errMsg = '' } = useSelector(state => {
+        return {
+            err: state.chatReducer.err,
+            errMsg: state.chatReducer.msg
         };
     });
 
+    // Redux dispatcher
+    const dispatch = useDispatch();
+
+    // Form layouts
     const assistantFormLayout = {
         type: 'WA',
-        name: 'Watson Assistant',
+        name: 'Watson Assistant (v2)',
         fields: [{
             name: 'Assistant Name',
             value: ''
@@ -71,9 +61,11 @@ const Settings = () => {
         }]
     };
 
+    // Layout switch state
     const [switchValue, setSwitchValue] = useState(false);
     const [formLayout, setFormLayout] = useState(assistantFormLayout);
 
+    // State handlers
     const switchValueChangeHandler = value => {
         setSwitchValue(value);
         if (value === false) {
@@ -105,7 +97,7 @@ const Settings = () => {
                 url: formLayout.fields[1].value
             };
         };
-        dispatch(actionCreators.changeCredentials({
+        dispatch(changeCredentials({
             type: formLayout.type,
             name: formLayout.fields[0].value,
             values
@@ -114,55 +106,57 @@ const Settings = () => {
 
     const styles = StyleSheet.create({
         container: {
-            padding: 24,
             flex: 1,
-            backgroundColor: '#f2f2f8',
-            paddingBottom
+            backgroundColor: '#f2f2f9'
         },
         form: {
-            flex: 1,
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingTop: 20,
-            paddingBottom: 40
-        },
-        formElement: {
+            height: '100%',
             width: '100%',
-            paddingHorizontal: 32,
-            marginVertical: 16,
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        },
-        labelText: {
-            fontSize: 16,
-            marginBottom: 8,
-            color: '#444'
-        },
-        input: {
-            height: 32,
-            fontSize: 16,
-            paddingHorizontal: 8,
-            width: '100%',
-            backgroundColor: '#fff'
-        },
-        modeSwitcher: {
-            justifyContent: 'center',
+            paddingVertical: 24,
+            justifyContent: 'flex-start',
             alignItems: 'center'
+        },
+        title: {
+            marginBottom: 12
+        },
+        formItem: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            width: '100%',
+            paddingVertical: 12,
+            borderColor: '#ddd',
+            borderBottomWidth: 1
+        },
+        firstItem: {
+            borderTopWidth: 1,
         },
         modeText: {
             fontSize: 22,
             marginBottom: 4
         },
-        submitButton: {
-            marginTop: 12
+        input: {
+            textAlign: 'left',
+            width: '100%',
+            paddingHorizontal: 12
+        },
+        labelText: {
+            fontSize: 18
+        },
+        submitBtn: {
+            marginTop: 48
+        },
+        submitText: {
+            color: '#187fff',
+            fontSize: 18
         }
     });
-
     return (
         <SafeAreaView style={styles.container}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.form}>
-                    <View style={styles.modeSwitcher}>
+                <ScrollView contentContainerStyle={styles.form}>
+                    <ErrorModal err={err} errMsg={errMsg} />
+                    <View style={[styles.title, styles.formItem, styles.firstItem]}>
                         <Text style={styles.modeText}>
                             {formLayout.name}
                         </Text>
@@ -170,23 +164,22 @@ const Settings = () => {
                             style={styles.switch}
                             onValueChange={switchValueChangeHandler}
                             value={switchValue}
-                            trackColor={{ false: '#44f', true: '#f00' }} thumbColor="#fff" ios_backgroundColor='#00f' />
+                            trackColor={{ false: '#187fff', true: '#f00' }} thumbColor="#fff" ios_backgroundColor='#00f' />
                     </View>
-                    {/* <View style={styles.fields}> */}
                     {formLayout.fields.map((field, index) => {
                         if (field.name === 'Location') {
                             if (Platform.OS !== 'ios') {
                                 return (
-                                    <View key={field.name} style={styles.formElement}>
+                                    <View key={field.name} style={styles.formItem}>
                                         <Text style={styles.labelText}>{field.name}</Text>
-                                        <Picker key={field.name} style={{ width: '100%', height: 50, backgroundColor: '#fff' }} selectedValue={field.value} onValueChange={v => fieldValueChangeHandler(v, index)} >
+                                        <Picker key={field.name} style={{ width: '100%', color: '#187fff', justifyContent: 'center', alignItems: 'center' }} selectedValue={field.value} onValueChange={v => fieldValueChangeHandler(v, index)} >
                                             {field.options.map(value => <Picker.Item key={value.name} label={value.name} value={value.url} />)}
                                         </Picker>
                                     </View>
                                 );
                             } else {
                                 return (
-                                    <View key={field.name} style={[styles.formElement, {alignItems: 'center'}]}>
+                                    <View key={field.name} style={[styles.formElement, { alignItems: 'center', marginTop: 48 }]}>
                                         <Text style={styles.labelText}>{field.name}</Text>
                                         <Button onPress={() => ActionSheetIOS.showActionSheetWithOptions({ options: field.options.map(option => option.name) }, i => {
                                             fieldValueChangeHandler(field.options[i].url, index)
@@ -195,17 +188,21 @@ const Settings = () => {
                                 );
                             };
                         } else {
+                            let firstItem = null;
+                            if (index === 0) {
+                                firstItem = styles.firstItem;
+                            };
                             return (
-                                <View key={field.name} style={styles.formElement}>
-                                    <Text style={styles.labelText}>{field.name}</Text>
-                                    <TextInput value={field.value} onChangeText={v => fieldValueChangeHandler(v, index)} style={styles.input} />
+                                <View key={field.name} style={[styles.formItem, firstItem]}>
+                                    <TextInput value={field.value} onChangeText={v => fieldValueChangeHandler(v, index)} placeholder={`Insert ${field.name} here...`} style={styles.input} />
                                 </View>
                             );
                         };
                     })}
-                    {/* </View> */}
-                    <Button style={styles.submitButton} onPress={submitNewCredentialsHandler} title="Save and change settings" />
-                </View>
+                    <TouchableOpacity style={styles.submitBtn} onPress={submitNewCredentialsHandler} title="Save and change settings">
+                        <Text style={styles.submitText}>Save and change settings</Text>
+                    </TouchableOpacity>
+                </ScrollView>
             </TouchableWithoutFeedback>
         </SafeAreaView>
     );

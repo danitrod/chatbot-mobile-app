@@ -1,6 +1,7 @@
 // React app navigation container, stack navigator & react
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import { Text } from 'react-native';
 import React from 'react';
 
 // App pages
@@ -29,6 +30,8 @@ const Routes = createAppContainer(
             screen: Settings,
             navigationOptions: {
                 title: 'Settings',
+                headerTitle: () => (<Text style={{ fontSize: 26, color: '#000' }}>Settings</Text>),
+                headerTitleContainerStyle: { width: '60%', justifyContent: 'center', alignItems: 'center' }
             }
         }
     }, {
@@ -36,7 +39,8 @@ const Routes = createAppContainer(
             headerTintColor: '#000',
             headerStyle: {
                 backgroundColor: '#ededed',
-            }
+            },
+            headerBackTitle: null
         }
     })
 );

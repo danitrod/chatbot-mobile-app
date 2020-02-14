@@ -24,7 +24,7 @@ const createSession = async (credentials) => {
     });
 };
 
-const sendMessage = (credentials, text) => {
+const sendMessageToWatson = (credentials, text) => {
     const url = `${credentials.url}/v2/assistants/${credentials.assistantId}/sessions/${credentials.sessionId}/message?version=2020-02-12`;
     return new Promise(resolve => {
         axios.post(url, {
@@ -55,4 +55,4 @@ const sendMessage = (credentials, text) => {
     });
 };
 
-export { createSession, sendMessage };
+export { createSession, sendMessageToWatson };

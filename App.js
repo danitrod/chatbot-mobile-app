@@ -14,7 +14,7 @@ if (!global.atob) {
   global.atob = decode;
 }
 
-YellowBox.ignoreWarnings(["Warning: Can't perform a React state update on an unmounted component."]);
+YellowBox.ignoreWarnings(["Require cycle: src/redux/actions/index.js", "Warning: Can't perform a React state update on an unmounted component."]);
 
 const App = () => {
   return (

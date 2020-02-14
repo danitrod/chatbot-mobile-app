@@ -1,6 +1,6 @@
 // React & Redux
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as actionCreators from '../redux/actions/index';
 
 // Expo Audio
@@ -16,6 +16,7 @@ import recordingIcon from '../icons/recording.png';
 
 // Components
 import Chat from '../components/Chat';
+import ErrorModal from '../components/ErrorModal';
 
 // Util
 import parseTime from '../util/parseTime';
@@ -36,21 +37,29 @@ const Main = () => {
     // Redux dispatcher
     const dispatch = useDispatch();
 
+    // Check errors to show modal
+    const { err = false, errMsg = '' } = useSelector(state => {
+        return {
+            err: state.chatReducer.err,
+            errMsg: state.chatReducer.msg
+        };
+    });
+
     // Dynamic text input position
     useEffect(() => {
         if (Platform.OS === 'ios') {
             Keyboard.addListener('keyboardWillChangeFrame', e => setBottomPos(e.endCoordinates.height));
             Keyboard.addListener('keyboardWillHide', () => setBottomPos(0));
             return () => {
-                Keyboard.removeListener('keyboardWillChangeFrame');
-                Keyboard.removeListener('keyboardWillHide');
+                Keyboard.removeAllListeners('keyboardWillChangeFrame');
+                Keyboard.removeAllListeners('keyboardWillHide');
             };
         } else {
             Keyboard.addListener('keyboardDidShow', e => setBottomPos(e.endCoordinates.height));
             Keyboard.addListener('keyboardDidHide', () => setBottomPos(0));
             return () => {
-                Keyboard.removeListener('keyboardDidShow');
-                Keyboard.removeListener('keyboardDidHide');
+                Keyboard.removeAllListeners('keyboardDidShow');
+                Keyboard.removeAllListeners('keyboardDidHide');
             };
         };
     });
@@ -183,6 +192,7 @@ const Main = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <ErrorModal err={err} errMsg={errMsg} />
             <Chat />
             <KeyboardAvoidingView style={styles.footer}  >
                 {inputView}

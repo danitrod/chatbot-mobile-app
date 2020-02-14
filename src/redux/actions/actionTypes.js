@@ -1,3 +1,6 @@
+// General
+export const CLOSE_MODAL = 'CLOSE_MODAL';
+
 // Chat reducer
 export const ADD_MESSAGE = 'ADD_MESSAGE';
 export const ADD_MESSAGE_STARTED = 'ADD_MESSAGE_STARTED';

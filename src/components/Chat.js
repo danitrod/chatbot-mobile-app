@@ -9,7 +9,7 @@ import parseTime from '../util/parseTime';
 const Chat = () => {
 
     // Chat history state from store
-    const state = useSelector((state) => {
+    const state = useSelector(state => {
         return {
             history: state.chatReducer.history
         };
