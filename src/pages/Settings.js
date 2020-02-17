@@ -143,6 +143,11 @@ const Settings = () => {
         labelText: {
             fontSize: 18
         },
+        location: {
+            alignItems: 'center',
+            marginTop: 48,
+            width: '100%'
+        },
         submitBtn: {
             marginTop: 48
         },
@@ -170,7 +175,7 @@ const Settings = () => {
                         if (field.name === 'Location') {
                             if (Platform.OS !== 'ios') {
                                 return (
-                                    <View key={field.name} style={styles.formItem}>
+                                    <View key={field.name} style={styles.location}>
                                         <Text style={styles.labelText}>{field.name}</Text>
                                         <Picker key={field.name} style={{ width: '100%', color: '#187fff', justifyContent: 'center', alignItems: 'center' }} selectedValue={field.value} onValueChange={v => fieldValueChangeHandler(v, index)} >
                                             {field.options.map(value => <Picker.Item key={value.name} label={value.name} value={value.url} />)}
@@ -179,7 +184,7 @@ const Settings = () => {
                                 );
                             } else {
                                 return (
-                                    <View key={field.name} style={[styles.formElement, { alignItems: 'center', marginTop: 48 }]}>
+                                    <View key={field.name} style={styles.location}>
                                         <Text style={styles.labelText}>{field.name}</Text>
                                         <Button onPress={() => ActionSheetIOS.showActionSheetWithOptions({ options: field.options.map(option => option.name) }, i => {
                                             fieldValueChangeHandler(field.options[i].url, index)
