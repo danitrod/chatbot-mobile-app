@@ -36,7 +36,7 @@ const ErrorModal = ({ err = false, errMsg = '' }) => {
             onRequestClose={() => dispatch(closeModal())}>
             <SafeAreaView style={styles.modalContainer}>
                 <View style={styles.modalBottomView}>
-                    <Text style={styles.modalMsg}>{errMsg.toString()}</Text>
+                    <Text style={styles.modalMsg}>{errMsg.toString() + " Your session may have expired or your credentials are incorrect. Please use the refresh session button on the top right of the screen, or configure your credentials correctly."}</Text>
                     <Button title="Clear" onPress={() => dispatch(closeModal())} />
                 </View>
             </SafeAreaView>

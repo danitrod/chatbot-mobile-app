@@ -3,6 +3,7 @@
     "name": "My Mobile Assistant",
     "slug": "chatbot-mobile-app",
     "privacy": "public",
+    "description": "This is an app for virtual assistant demonstration. Try out your Watson Assistant or your chatbot orchestrator in real time with your phone.",
     "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
