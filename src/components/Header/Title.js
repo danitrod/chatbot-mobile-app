@@ -13,7 +13,7 @@ const Title = () => {
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 26,
+        fontSize: 22,
         color: '#000'
     }
 });

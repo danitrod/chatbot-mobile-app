@@ -15,7 +15,6 @@ const ErrorModal = ({ err = false, errMsg = '' }) => {
             paddingVertical: 48
         },
         modalBottomView: {
-            height: '50%',
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingBottom: 32

@@ -30,7 +30,7 @@ const Routes = createAppContainer(
             screen: Settings,
             navigationOptions: {
                 title: 'Settings',
-                headerTitle: () => (<Text style={{ fontSize: 26, color: '#000' }}>Settings</Text>),
+                headerTitle: () => (<Text style={{ fontSize: 22, color: '#000' }}>Settings</Text>),
                 headerTitleContainerStyle: { width: '60%', justifyContent: 'center', alignItems: 'center' }
             }
         }

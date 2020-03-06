@@ -9,8 +9,8 @@ export const addMessage = message => {
     return async (dispatch, getState) => {
         dispatch(addMessageSuccess(message));
         const credentials = getState().settingsReducer.values;
-        if (credentials.type === 'WA') {
-            if (message.type === 'txt') {
+        if (message.type === 'txt') {
+            if (credentials.type === 'WA') {
                 const messageResponse = await sendMessageToWatson(credentials, message.msg);
                 if (messageResponse.err !== true) {
                     messageResponse.msg.map((msg, index) => dispatch(addMessageSuccess({
@@ -22,9 +22,7 @@ export const addMessage = message => {
                 } else {
                     dispatch(addMessageFailure(messageResponse.msg));
                 };
-            };
-        } else {
-            if (message.type === 'txt') {
+            } else {
                 const messageResponse = await sendMessageToOrchestrator(credentials, message.msg);
                 if (messageResponse.err !== true) {
                     messageResponse.msg.map((msg, index) => dispatch(addMessageSuccess({
@@ -37,6 +35,8 @@ export const addMessage = message => {
                     dispatch(addMessageFailure(messageResponse.msg));
                 };
             };
+        } else {
+
         };
     };
 };

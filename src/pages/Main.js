@@ -81,7 +81,7 @@ const Main = () => {
         };
     }, [isRecording]);
 
-    // Manage sent messages
+    // Manage sending message button press
     const sendMessageHandler = async () => {
         if (button.type === 'voice') {
             // Voice message
