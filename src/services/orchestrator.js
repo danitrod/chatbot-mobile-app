@@ -6,6 +6,8 @@ const sendMessageToOrchestrator = (credentials, text) => {
             input: {
                 text
             }
+        }, {
+            timeout: 7000
         })
             .then(res => {
                 resolve({

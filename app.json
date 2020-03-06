@@ -23,15 +23,6 @@
     },
     "assetBundlePatterns": [
       "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.danitrod.mobile-chat-app",
-      "buildNumber": "1.0.0"
-    },
-    "android": {
-      "package": "com.danitrod.mobile-chat-app",
-      "versionCode": 1
-    }
+    ]
   }
 }
