@@ -4,9 +4,8 @@
 
 <div align="center">
     <img src="./doc/demo.gif" height="512px" alt="demo" />
+    <p><i>COVID bot from <a href="https://github.com/Call-for-Code/Solution-Starter-Kit-Communication-2020">https://github.com/Call-for-Code/Solution-Starter-Kit-Communication-2020</a></i></p>
 </div>
-
-_COVID bot from https://github.com/Call-for-Code/Solution-Starter-Kit-Communication-2020_
 
 ## Introduction
 
