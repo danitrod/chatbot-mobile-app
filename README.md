@@ -1,5 +1,10 @@
 # Chatbot Mobile App
 
+## Demo
+
+![demo](./doc/demo.gif)
+_COVID bot from https://github.com/Call-for-Code/Solution-Starter-Kit-Communication-2020_
+
 ## Introduction
 This is a demo app to test your virtual assistant. It can currently be used with Watson Assistant or with any other virtual assistant orchestrator, through a HTTP POST request to a provided URL. All the credentials must be configured through the app. Try the app out at https://expo.io/@danitrod/chatbot-mobile-app.
 
