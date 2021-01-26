@@ -2,21 +2,27 @@
 
 ## Demo
 
-![demo](./doc/demo.gif)
+<div align="center">
+    <img src="./doc/demo.gif" max-height="512px" alt="demo" />
+</div>
+
 _COVID bot from https://github.com/Call-for-Code/Solution-Starter-Kit-Communication-2020_
 
 ## Introduction
+
 This is a demo app to test your virtual assistant. It can currently be used with Watson Assistant or with any other virtual assistant orchestrator, through a HTTP POST request to a provided URL. All the credentials must be configured through the app. Try the app out at https://expo.io/@danitrod/chatbot-mobile-app.
 
 ## Roadmap
-* [x] Send and receive text messages
-* [x] Record and play voice messages
-* [ ] Transcribe voice messages to text
-* [ ] Transcribe text response to voice message
-* [ ] Receive options type message
-* [ ] Receive image type message
+
+- [x] Send and receive text messages
+- [x] Record and play voice messages
+- [ ] Transcribe voice messages to text
+- [ ] Transcribe text response to voice message
+- [ ] Receive options type message
+- [ ] Receive image type message
 
 ## Contributing
+
 Please feel free to create an issue or fork the repository and submit a pull request. I will be happy to add any features to the app.
 
 Please follow the instructions below to submit a pull request.
@@ -29,6 +35,7 @@ Please follow the instructions below to submit a pull request.
 4. Wait for the approval and enjoy the new feature! :D
 
 ## License
+
 Copyright 2020 Daniel T. Rodrigues
 
 Licensed under the Apache License, Version 2.0 (the "License");
