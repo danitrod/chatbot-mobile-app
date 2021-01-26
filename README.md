@@ -3,7 +3,7 @@
 ## Demo
 
 <div align="center">
-    <img src="./doc/demo.gif" max-height="512px" alt="demo" />
+    <img src="./doc/demo.gif" height="512px" alt="demo" />
 </div>
 
 _COVID bot from https://github.com/Call-for-Code/Solution-Starter-Kit-Communication-2020_
