@@ -1,19 +1,19 @@
-import * as actionTypes from "./actionTypes";
-import { setCredentials } from "./settings";
 import {
-  sendMessageToWatson,
-  createSession
-} from "../../services/conversation";
-import { sendMessageToOrchestrator } from "../../services/orchestrator";
+  createSession,
+  sendMessageToWatson
+} from '../../services/conversation';
+import { sendMessageToOrchestrator } from '../../services/orchestrator';
+import * as actionTypes from './actionTypes';
+import { setCredentials } from './settings';
 
 // Adds sent message to state, then sends message to Watson/Orchestrator and adds response to state.
 // TODO: implement speech to text case
-export const addMessage = message => {
+export const addMessage = (message) => {
   return async (dispatch, getState) => {
     dispatch(addMessageSuccess(message));
     const credentials = getState().settingsReducer;
-    if (message.type === "txt") {
-      if (credentials.type === "WA") {
+    if (message.type === 'txt') {
+      if (credentials.type === 'WA') {
         const messageResponse = await sendMessageToWatson(
           credentials.values,
           message.msg
@@ -22,9 +22,9 @@ export const addMessage = message => {
           messageResponse.msg.map((msg, index) =>
             dispatch(
               addMessageSuccess({
-                type: "txt",
+                type: 'txt',
                 msg,
-                from: "other",
+                from: 'other',
                 time: new Date().toString() + `-${index}`
               })
             )
@@ -41,9 +41,9 @@ export const addMessage = message => {
           messageResponse.msg.map((msg, index) =>
             dispatch(
               addMessageSuccess({
-                type: "txt",
+                type: 'txt',
                 msg,
-                from: "other",
+                from: 'other',
                 time: new Date().toString() + `-${index}`
               })
             )
@@ -62,19 +62,22 @@ export const addMessage = message => {
 export const refresh = () => {
   return async (dispatch, getState) => {
     const credentials = getState().settingsReducer;
-    if (credentials.type === "WA") {
+    if (credentials.type === 'WA') {
       const res = await createSession(credentials.values);
       if (res.err !== true) {
         credentials.values.sessionId = res.sessionId;
         dispatch(setCredentials(credentials));
-        const messageResponse = await sendMessageToWatson(credentials.values, "oi");
+        const messageResponse = await sendMessageToWatson(
+          credentials.values,
+          ''
+        );
         if (messageResponse.err !== true) {
           dispatch(
             refreshSuccess(
               messageResponse.msg.map((msg, index) => ({
-                type: "txt",
+                type: 'txt',
                 msg,
-                from: "other",
+                from: 'other',
                 time: new Date().toString() + `-${index}`
               }))
             )
@@ -88,15 +91,15 @@ export const refresh = () => {
     } else {
       const messageResponse = await sendMessageToOrchestrator(
         credentials.values,
-        "oi"
+        ''
       );
       if (messageResponse.err !== true) {
         dispatch(
           refreshSuccess(
             messageResponse.msg.map((msg, index) => ({
-              type: "txt",
+              type: 'txt',
               msg,
-              from: "other",
+              from: 'other',
               time: new Date().toString() + `-${index}`
             }))
           )
@@ -108,22 +111,22 @@ export const refresh = () => {
   };
 };
 
-const addMessageSuccess = message => ({
+const addMessageSuccess = (message) => ({
   type: actionTypes.ADD_MESSAGE_SUCCESS,
   message
 });
 
-const addMessageFailure = error => ({
+const addMessageFailure = (error) => ({
   type: actionTypes.ADD_MESSAGE_FAILURE,
   msg: error
 });
 
-const refreshSuccess = message => ({
+const refreshSuccess = (message) => ({
   type: actionTypes.REFRESH_SUCCESS,
   message
 });
 
-const refreshFailure = error => ({
+const refreshFailure = (error) => ({
   type: actionTypes.REFRESH_FAILURE,
   msg: error
 });
