@@ -7,7 +7,16 @@ import * as actionCreators from '../redux/actions/index';
 import { Audio } from 'expo-av';
 
 // React Native
-import { StyleSheet, SafeAreaView, Text, KeyboardAvoidingView, TextInput, TouchableOpacity, Keyboard, Image } from 'react-native';
+import {
+    StyleSheet,
+    SafeAreaView,
+    Text,
+    KeyboardAvoidingView,
+    TextInput,
+    TouchableOpacity,
+    Keyboard,
+    Image
+} from 'react-native';
 
 // Icons
 import microphoneIcon from '../icons/microphone.png';
@@ -28,7 +37,7 @@ const recordingOptions = {
         audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
         sampleRate: 44100,
         numberOfChannels: 2,
-        bitRate: 128000,
+        bitRate: 128000
     },
     ios: {
         extension: '.caf',
@@ -38,15 +47,17 @@ const recordingOptions = {
         bitRate: 128000,
         linearPCMBitDepth: 16,
         linearPCMIsBigEndian: false,
-        linearPCMIsFloat: false,
-    },
-}
+        linearPCMIsFloat: false
+    }
+};
 
 const Main = () => {
-
     // Text Input
     const [bottomPos, setBottomPos] = useState(0);
-    const [button, setButton] = useState({ type: 'voice', icon: recordingIcon });
+    const [button, setButton] = useState({
+        type: 'voice',
+        icon: recordingIcon
+    });
     const [inputMessage, setInputMessage] = useState('');
 
     // Voice Input
@@ -69,20 +80,24 @@ const Main = () => {
     // Dynamic text input position
     useEffect(() => {
         if (Platform.OS === 'ios') {
-            Keyboard.addListener('keyboardWillChangeFrame', e => setBottomPos(e.endCoordinates.height));
+            Keyboard.addListener('keyboardWillChangeFrame', e =>
+                setBottomPos(e.endCoordinates.height)
+            );
             Keyboard.addListener('keyboardWillHide', () => setBottomPos(0));
             return () => {
                 Keyboard.removeAllListeners('keyboardWillChangeFrame');
                 Keyboard.removeAllListeners('keyboardWillHide');
             };
         } else {
-            Keyboard.addListener('keyboardDidShow', e => setBottomPos(e.endCoordinates.height));
+            Keyboard.addListener('keyboardDidShow', e =>
+                setBottomPos(e.endCoordinates.height)
+            );
             Keyboard.addListener('keyboardDidHide', () => setBottomPos(0));
             return () => {
                 Keyboard.removeAllListeners('keyboardDidShow');
                 Keyboard.removeAllListeners('keyboardDidHide');
             };
-        };
+        }
     });
 
     // Button icon
@@ -91,7 +106,7 @@ const Main = () => {
             setButton({ type: 'text', icon: sendIcon });
         } else {
             setButton({ type: 'voice', icon: microphoneIcon });
-        };
+        }
     }, [inputMessage]);
 
     useEffect(() => {
@@ -99,7 +114,7 @@ const Main = () => {
             setButton({ type: 'recording', icon: recordingIcon });
         } else {
             setButton({ type: 'voice', icon: microphoneIcon });
-        };
+        }
     }, [isRecording]);
 
     // Manage sending message button press
@@ -114,34 +129,48 @@ const Main = () => {
                         playsInSilentModeIOS: true
                     });
                     setPermission(true);
-                };
-            };
+                }
+            }
             await Audio.setAudioModeAsync({ allowsRecordingIOS: true });
             const recordingInstance = new Audio.Recording();
-            await recordingInstance.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+            await recordingInstance.prepareToRecordAsync(
+                Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+            );
             recordingInstance.setProgressUpdateInterval(1000);
             recordingInstance.setOnRecordingStatusUpdate(status => {
                 if (status.canRecord) {
                     setIsRecording(status.isRecording);
-                    setTimeRecording(parseTime(Math.round(status.durationMillis / 1000)));
+                    setTimeRecording(
+                        parseTime(Math.round(status.durationMillis / 1000))
+                    );
                 } else if (status.isDoneRecording) {
                     setIsRecording(false);
-                    setTimeRecording(('0:00'));
-                };
+                    setTimeRecording('0:00');
+                }
             });
-            recordingInstance.startAsync()
+            recordingInstance
+                .startAsync()
                 .then(status => {
                     setIsRecording(status.isRecording);
-                    setTimeRecording(parseTime(Math.round(status.durationMillis / 1000)));
+                    setTimeRecording(
+                        parseTime(Math.round(status.durationMillis / 1000))
+                    );
                 })
                 .catch(e => console.error(e));
             setRecording(recordingInstance);
         } else if (button.type === 'text') {
             // Text message
             Keyboard.dismiss();
-            dispatch(actionCreators.addMessage({ type: 'txt', msg: inputMessage, from: 'self', time: new Date() }));
+            dispatch(
+                actionCreators.addMessage({
+                    type: 'txt',
+                    msg: inputMessage,
+                    from: 'self',
+                    time: new Date()
+                })
+            );
             setInputMessage('');
-        };
+        }
     };
 
     // Conclude recording
@@ -149,8 +178,16 @@ const Main = () => {
         if (button.type === 'recording') {
             const { durationMillis } = await recording.stopAndUnloadAsync();
             const uri = recording.getURI();
-            dispatch(actionCreators.addMessage({ type: 'audio', msg: { uri, duration: durationMillis }, from: 'self', time: new Date() }));
-        };
+            console.log(Object.keys(recording));
+            dispatch(
+                actionCreators.addMessage({
+                    type: 'audio',
+                    msg: { uri, duration: durationMillis },
+                    from: 'self',
+                    time: new Date()
+                })
+            );
+        }
     };
 
     // CSS Styles
@@ -196,32 +233,32 @@ const Main = () => {
     // Input field does not appear when app is recording, in which case it will show the recording time instead.
     let inputView;
     if (isRecording === true) {
-        inputView = (
-            <Text
-                style={styles.time}>
-                {timeRecording}</Text>
-        );
+        inputView = <Text style={styles.time}>{timeRecording}</Text>;
     } else {
         inputView = (
             <TextInput
                 multiline={true}
                 value={inputMessage}
                 style={styles.input}
-                onChangeText={m => setInputMessage(m)} />
+                onChangeText={m => setInputMessage(m)}
+            />
         );
-    };
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <ErrorModal err={err} errMsg={errMsg} />
             <Chat />
-            <KeyboardAvoidingView style={styles.footer}  >
+            <KeyboardAvoidingView style={styles.footer}>
                 {inputView}
-                <TouchableOpacity onPress={sendMessageConcluded} onPressIn={sendMessageHandler}>
+                <TouchableOpacity
+                    onPress={sendMessageConcluded}
+                    onPressIn={sendMessageHandler}
+                >
                     <Image source={button.icon} style={styles.button} />
                 </TouchableOpacity>
             </KeyboardAvoidingView>
-        </SafeAreaView >
+        </SafeAreaView>
     );
 };
 
