@@ -1,12 +1,3 @@
-export {
-    closeModal
-} from './general';
-
-export {
-    addMessage,
-    refresh
-} from './chat';
-
-export {
-    changeCredentials
-} from './settings';
+export { addMessage, refresh } from './chat';
+export { closeModal } from './general';
+export { changeCredentials } from './settings';
